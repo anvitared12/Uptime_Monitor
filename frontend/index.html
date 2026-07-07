@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Uptime Monitor — Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Uptime Monitor</h1>
+    <section>
+      <form id="add-form">
+        <input id="url-input" type="url" placeholder="https://example.com" required />
+        <button type="submit">Add URL</button>
+      </form>
+    </section>
+
+    <section>
+      <table id="urls-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>URL</th>
+            <th>Status</th>
+            <th>Response Time</th>
+            <th>Last Checked</th>
+            <th>Created At</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+Uptime Monitor - Build Summary
+Date: 2026-07-07
+
+Overview:
+- Small MVP uptime monitor using FastAPI (backend) and vanilla JS (frontend).
+- SQLite via SQLAlchemy for persistence. APScheduler runs periodic health checks using httpx.
+
+Architecture / Stack:
+- Backend: Python 3.11 virtualenv (.venv or .venv311), FastAPI, Uvicorn, SQLAlchemy, Pydantic, APScheduler, httpx.
+- Database: SQLite (local file created by SQLAlchemy engine).
+- Frontend: static files in `frontend/` (index.html, styles.css, app.js) using Fetch API.
+
+Key files and roles:
+- `backend/app/main.py` - FastAPI app entrypoint, CORS, router include, scheduler lifecycle hooks.
+- `backend/app/database.py` - SQLAlchemy engine, session and Base.
+- `backend/app/models.py` - `URL` and `HealthCheck` models with relationships.
+- `backend/app/schemas.py` - Pydantic models: `UrlCreate`, `UrlRead`, `HealthCheckRead`, `UrlStatusRead`.
+- `backend/app/routers/urls.py` - `POST /urls/` (add) and `GET /urls/` (list with latest health).
+- `backend/app/checker.py` - async ping utility measuring response_time and status.
+- `backend/app/scheduler.py` - APScheduler job that pings URLs and stores `HealthCheck` records.
+- `frontend/index.html`, `frontend/app.js`, `frontend/styles.css` - UI for adding URLs and viewing latest status.
+
+Current status (what's implemented):
+- Project scaffolded and files created.
+- `POST /urls/` and `GET /urls/` implemented; `GET /urls/` returns `latest_check` in responses.
+- Scheduler starts on app startup and stores health checks in DB.
+- Frontend can add URLs, displays table with status, response time, last checked; auto-refresh every 10s implemented.
+
+Remaining / TODO:
+- Step 13: polish latest-status display and UI UX (in progress).
+- Step 14: Dockerize backend + frontend.
+- Step 15: Add README and AI_LOG.
+
+Run instructions (from repo):
+1) Use the backend folder and the project's venv (activate or call python directly):
+   Set-Location 'D:\WebsiteCheck\backend'
+
+2) If venv not activated, run with its python (example using `.venv311`):
+   .\.venv311\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8001
+
+3) Or activate then run:
+   .\.venv311\Scripts\Activate.ps1
+   python -m uvicorn app.main:app --host 127.0.0.1 --port 8001
+
+Notes & Troubleshooting:
+- If you see "only one usage of each socket address..." it means port already in use. Find and stop the process, or run on another port (e.g. `--port 8002`).
+- If `Activate.ps1` is missing but your prompt shows a venv (prefix like `(.venv311)`), the venv is already active and you can run `python -m uvicorn ...` directly.
+- Confirm the venv path with `Get-ChildItem -Directory` and `Test-Path .\.venv311\Scripts\python.exe`.
+
+Where to look next in the codebase:
+- `backend/app/routers/urls.py` - response shaping and latest_check logic.
+- `frontend/app.js` - rendering of `latest_check`, auto-refresh interval.
+
+If you want, I can:
+- Add a README.md with run and build steps.
+- Dockerize the backend and provide a `docker-compose.yml`.
+- Add colored status indicators and manual refresh controls to the frontend.
+cd D:\WebsiteCheck\backend
+..\.venv311\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
