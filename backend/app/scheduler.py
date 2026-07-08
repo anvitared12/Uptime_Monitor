@@ -70,6 +70,7 @@ class Scheduler:
             replace_existing=True,
             coalesce=True,
             max_instances=1,
+            misfire_grace_time=10,
         )
         self._sched.start()
 

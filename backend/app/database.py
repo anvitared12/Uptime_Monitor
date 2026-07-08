@@ -1,10 +1,13 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# SQLITE database file location
-# This tells SQLAlchemy to create a file named "uptime_monitor.db" in the backend directory.
-SQLALCHEMY_DATABASE_URL = "sqlite:///./uptime_monitor.db"
+# SQLite database file location.
+# Docker Compose sets DATABASE_URL to a volume-backed path; local runs keep using
+# the existing backend/uptime_monitor.db file by default.
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./uptime_monitor.db")
 
 # Create the SQLAlchemy engine
 # The engine is the core interface to the database. It manages connections and translates SQL.

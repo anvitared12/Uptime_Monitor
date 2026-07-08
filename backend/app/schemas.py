@@ -1,6 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, field_serializer
+
+
+def serialize_utc_datetime(value: datetime) -> str:
+    """Return ISO-8601 UTC timestamps with a Z suffix for browser conversion."""
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 class UrlCreate(BaseModel):
@@ -15,6 +22,10 @@ class HealthCheckRead(BaseModel):
 
     model_config = {"from_attributes": True}
 
+    @field_serializer("checked_at")
+    def serialize_checked_at(self, value: datetime) -> str:
+        return serialize_utc_datetime(value)
+
 
 class UrlRead(BaseModel):
     id: int
@@ -22,6 +33,10 @@ class UrlRead(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+    @field_serializer("created_at")
+    def serialize_created_at(self, value: datetime) -> str:
+        return serialize_utc_datetime(value)
 
 
 class UrlStatusRead(UrlRead):

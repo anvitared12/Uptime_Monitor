@@ -41,6 +41,8 @@ app.include_router(urls_router.router)
 
 # Wire the background scheduler to FastAPI startup/shutdown events
 from app.scheduler import scheduler as background_scheduler
+from app.database import Base, engine
+from app import models  # noqa: F401 - registers SQLAlchemy models before create_all
 import logging
 
 
@@ -48,6 +50,7 @@ import logging
 async def _startup_event():
     # configure basic logging for scheduler output
     logging.basicConfig(level=logging.INFO)
+    Base.metadata.create_all(bind=engine)
     background_scheduler.start()
 
 
