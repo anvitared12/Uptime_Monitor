@@ -1,0 +1,21 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: sqlite:////app/data/uptime_monitor.db
+    ports:
+      - "8000:8000"
+    volumes:
+      - uptime-data:/app/data
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "5500:80"
+
+volumes:
+  uptime-data:

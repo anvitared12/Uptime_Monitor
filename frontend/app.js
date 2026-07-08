@@ -1,4 +1,4 @@
-const API_BASES = ["http://127.0.0.1:8001", "http://127.0.0.1:8000"];
+const API_BASES = ["http://localhost:8000", "http://127.0.0.1:8000", "http://127.0.0.1:8001"];
 const AUTO_REFRESH_MS = 10000;
 let activeApiBase = localStorage.getItem("uptime_api_base") || API_BASES[0];
 
@@ -26,6 +26,13 @@ async function fetchUrls(){
   return res.json();
 }
 
+function formatDateTime(value){
+  if(!value) return '-';
+  const hasTimeZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(value);
+  const normalizedValue = hasTimeZone ? value : `${value}Z`;
+  return new Date(normalizedValue).toLocaleString();
+}
+
 function renderUrls(urls){
   const tbody = document.querySelector('#urls-table tbody');
   tbody.innerHTML = '';
@@ -34,7 +41,7 @@ function renderUrls(urls){
       ? u.latest_check.is_up ? 'UP' : 'DOWN'
       : 'unknown';
     const responseTime = u.latest_check ? `${u.latest_check.response_time_ms} ms` : '-';
-    const checkedAt = u.latest_check ? new Date(u.latest_check.checked_at).toLocaleString() : '-';
+    const checkedAt = u.latest_check ? formatDateTime(u.latest_check.checked_at) : '-';
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${u.id}</td>
@@ -42,7 +49,7 @@ function renderUrls(urls){
       <td>${status}</td>
       <td>${responseTime}</td>
       <td>${checkedAt}</td>
-      <td>${new Date(u.created_at).toLocaleString()}</td>
+      <td>${formatDateTime(u.created_at)}</td>
     `;
     tbody.appendChild(tr);
   }

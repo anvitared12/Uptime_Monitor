@@ -25,13 +25,56 @@ Current status (what's implemented):
 - `POST /urls/` and `GET /urls/` implemented; `GET /urls/` returns `latest_check` in responses.
 - Scheduler starts on app startup and stores health checks in DB.
 - Frontend can add URLs, displays table with status, response time, last checked; auto-refresh every 10s implemented.
+- Docker Compose orchestration added for one-command local startup.
+- Backend image builds from `backend/Dockerfile`; frontend image builds from `frontend/Dockerfile`.
+- Root `docker-compose.yml` starts both services and persists SQLite data in the `uptime-data` named volume.
 
 Remaining / TODO:
 - Step 13: polish latest-status display and UI UX (in progress).
-- Step 14: Dockerize backend + frontend.
+- Step 14: Dockerize backend + frontend. (done)
 - Step 15: Add README and AI_LOG.
 
+Single-command Docker Compose orchestration plan:
+- Root `docker-compose.yml` will be the one command entrypoint for the whole project. Running `docker compose up --build` from `D:\WebsiteCheck` should build and start every local service needed by the app.
+- Backend service:
+  - Builds from `backend/Dockerfile`.
+  - Uses Python 3.11 slim, installs `backend/requirements.txt`, and runs `uvicorn app.main:app --host 0.0.0.0 --port 8000`.
+  - Exposes the API on host port `8000` at `http://localhost:8000`.
+  - Mounts a named Docker volume at `/app/data` so the SQLite database survives container restarts.
+  - Sets `DATABASE_URL=sqlite:////app/data/uptime_monitor.db` so SQLAlchemy stores data in the volume rather than inside the disposable container filesystem.
+- Frontend service:
+  - Uses `frontend/Dockerfile` with nginx to serve the static `index.html`, `styles.css`, and `app.js` files.
+  - Exposes the dashboard on host port `5500` at `http://localhost:5500`.
+  - Depends on the backend service so Compose starts the API before the dashboard container.
+- Frontend/API wiring:
+  - `frontend/app.js` will include `http://localhost:8000` and `http://127.0.0.1:8000` as API candidates so the browser can call the backend through the host-mapped Compose port.
+  - Backend CORS will allow `http://localhost:5500` and `http://127.0.0.1:5500`, matching the Compose frontend URL.
+- Expected local startup:
+  - Command: `docker compose up --build`
+  - Dashboard: `http://localhost:5500`
+  - API docs: `http://localhost:8000/docs`
+  - Stop: `Ctrl+C`, or `docker compose down`
+
+Implemented Docker files:
+- `docker-compose.yml` - defines backend, frontend, port mappings, dependency order, and the `uptime-data` volume.
+- `backend/Dockerfile` - builds the FastAPI API image and runs Uvicorn on container port `8000`.
+- `backend/.dockerignore` - keeps local venvs, pycache, and the host SQLite database out of the image.
+- `frontend/Dockerfile` - serves the static dashboard through nginx on container port `80`.
+- `frontend/.dockerignore` - excludes local frontend-only noise from the image build context.
+
 Run instructions (from repo):
+Preferred Docker path:
+1) From `D:\WebsiteCheck`, run:
+   docker compose up --build
+
+2) Open:
+   Dashboard: http://localhost:5500
+   API docs: http://localhost:8000/docs
+
+3) Stop with `Ctrl+C`, or run:
+   docker compose down
+
+Manual backend path:
 1) Use the backend folder and the project's venv (activate or call python directly):
    Set-Location 'D:\WebsiteCheck\backend'
 
@@ -53,7 +96,6 @@ Where to look next in the codebase:
 
 If you want, I can:
 - Add a README.md with run and build steps.
-- Dockerize the backend and provide a `docker-compose.yml`.
 - Add colored status indicators and manual refresh controls to the frontend.
 cd D:\WebsiteCheck\backend
 ..\.venv311\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
