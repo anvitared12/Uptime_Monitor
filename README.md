@@ -17,7 +17,7 @@ A simple **Uptime Monitoring MVP** built using **FastAPI**, **SQLite**, **SQLAlc
 
 # AI Collaboration Log
 
-This project was intentionally built as a learning-first exercise rather than asking AI to generate the entire application.
+This project was intentionally built as a step by step process so that each process i smonitored, rather than asking AI to generate the entire application.
 
 ## AI Tools Used
 
@@ -93,9 +93,7 @@ Each step was completed, tested, and verified before proceeding to the next.
 ## Dockerization
 
 Once both the backend and frontend were functioning correctly, Docker support was added.
-
-The prompt used for Docker was intentionally concise:
-
+Prompt used:
 > "For this project there is one task remaining: the entire environment must be orchestrated to spin up locally out-of-the-box with a single `docker compose up` command. Before generating code, explain each part."
 
 For Docker-related issues, I primarily relied on:
@@ -189,7 +187,7 @@ No additional setup is required.
 - Vanilla JavaScript
 - Fetch API
 
-### DevOps
+### Docker
 
 - Docker
 - Docker Compose
@@ -198,7 +196,7 @@ No additional setup is required.
 
 # Deployment Sketch (AWS)
 
-## Proposed Cloud Architecture
+## Cloud Architecture
 
 For production deployment, I would host this application on **AWS** using an **EC2 instance**. The application is already containerized with Docker Compose, making it straightforward to deploy on a virtual machine.
 
